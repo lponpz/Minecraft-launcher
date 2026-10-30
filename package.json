@@ -1,0 +1,34 @@
+{
+  "name": "nexus-client",
+  "version": "0.1.0",
+  "description": "Nexus Client launcher prototype",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^34.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.nexusclient.launcher",
+    "productName": "Nexus Client",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
