@@ -1,0 +1,2 @@
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('nexus',{listInstances:()=>ipcRenderer.invoke('instances:list'),createInstance:n=>ipcRenderer.invoke('instances:create',n),renameInstance:(id,n)=>ipcRenderer.invoke('instances:rename',id,n),deleteInstance:id=>ipcRenderer.invoke('instances:delete',id),chooseFolder:id=>ipcRenderer.invoke('folder:choose',id),inspectFolder:id=>ipcRenderer.invoke('folder:inspect',id)});
