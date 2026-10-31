@@ -19,26 +19,19 @@ public final class NexusClientMenuScreen extends Screen {
         int row = 24;
         int top = 58;
 
-        addDrawableChild(toggle(left, top, buttonWidth, coordinateLabel(),
-            () -> NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates, NexusClientMenuScreen::coordinateLabel));
-        addDrawableChild(toggle(right, top, buttonWidth, hudLabel(),
-            () -> NexusClientMod.compactHud = !NexusClientMod.compactHud, NexusClientMenuScreen::hudLabel));
-        addDrawableChild(toggle(left, top + row, buttonWidth, healthLabel(),
-            () -> NexusClientMod.healthIndicator = !NexusClientMod.healthIndicator, NexusClientMenuScreen::healthLabel));
-        addDrawableChild(toggle(right, top + row, buttonWidth, fpsLabel(),
-            () -> NexusClientMod.showFps = !NexusClientMod.showFps, NexusClientMenuScreen::fpsLabel));
-        addDrawableChild(toggle(left, top + row * 2, buttonWidth, armorLabel(),
-            () -> NexusClientMod.showArmor = !NexusClientMod.showArmor, NexusClientMenuScreen::armorLabel));
-        addDrawableChild(toggle(right, top + row * 2, buttonWidth, durabilityLabel(),
-            () -> NexusClientMod.showDurability = !NexusClientMod.showDurability, NexusClientMenuScreen::durabilityLabel));
-        addDrawableChild(toggle(left, top + row * 3, buttonWidth, pingLabel(),
-            () -> NexusClientMod.showPing = !NexusClientMod.showPing, NexusClientMenuScreen::pingLabel));
-        addDrawableChild(toggle(right, top + row * 3, buttonWidth, directionLabel(),
-            () -> NexusClientMod.showDirection = !NexusClientMod.showDirection, NexusClientMenuScreen::directionLabel));
+        addDrawableChild(toggle(left, top, buttonWidth, coordinateLabel(), () -> NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates, NexusClientMenuScreen::coordinateLabel));
+        addDrawableChild(toggle(right, top, buttonWidth, hudLabel(), () -> NexusClientMod.compactHud = !NexusClientMod.compactHud, NexusClientMenuScreen::hudLabel));
+        addDrawableChild(toggle(left, top + row, buttonWidth, healthLabel(), () -> NexusClientMod.healthIndicator = !NexusClientMod.healthIndicator, NexusClientMenuScreen::healthLabel));
+        addDrawableChild(toggle(right, top + row, buttonWidth, fpsLabel(), () -> NexusClientMod.showFps = !NexusClientMod.showFps, NexusClientMenuScreen::fpsLabel));
+        addDrawableChild(toggle(left, top + row * 2, buttonWidth, armorLabel(), () -> NexusClientMod.showArmor = !NexusClientMod.showArmor, NexusClientMenuScreen::armorLabel));
+        addDrawableChild(toggle(right, top + row * 2, buttonWidth, durabilityLabel(), () -> NexusClientMod.showDurability = !NexusClientMod.showDurability, NexusClientMenuScreen::durabilityLabel));
+        addDrawableChild(toggle(left, top + row * 3, buttonWidth, pingLabel(), () -> NexusClientMod.showPing = !NexusClientMod.showPing, NexusClientMenuScreen::pingLabel));
+        addDrawableChild(toggle(right, top + row * 3, buttonWidth, directionLabel(), () -> NexusClientMod.showDirection = !NexusClientMod.showDirection, NexusClientMenuScreen::directionLabel));
+        addDrawableChild(toggle(left, top + row * 4, buttonWidth, biomeLabel(), () -> NexusClientMod.showBiome = !NexusClientMod.showBiome, NexusClientMenuScreen::biomeLabel));
+        addDrawableChild(toggle(right, top + row * 4, buttonWidth, clockLabel(), () -> NexusClientMod.showWorldClock = !NexusClientMod.showWorldClock, NexusClientMenuScreen::clockLabel));
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"),
-                button -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(left, top + row * 4, totalWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), button -> this.client.setScreen(new ServerInviteScreen()))
+            .dimensions(left, top + row * 5, totalWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
             .dimensions(width / 2 - 50, height - 28, 100, 20).build());
     }
@@ -60,6 +53,8 @@ public final class NexusClientMenuScreen extends Screen {
     private static Text durabilityLabel() { return Text.literal("Armor Durability: " + onOff(NexusClientMod.showDurability)); }
     private static Text pingLabel() { return Text.literal("Ping Display: " + onOff(NexusClientMod.showPing)); }
     private static Text directionLabel() { return Text.literal("Facing Direction: " + onOff(NexusClientMod.showDirection)); }
+    private static Text biomeLabel() { return Text.literal("Biome Display: " + onOff(NexusClientMod.showBiome)); }
+    private static Text clockLabel() { return Text.literal("World Clock: " + onOff(NexusClientMod.showWorldClock)); }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
