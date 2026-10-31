@@ -19,6 +19,10 @@ public final class ClientConfig {
             try (InputStream in = Files.newInputStream(FILE)) { p.load(in); }
             catch (IOException e) { System.err.println("[Nexus Client] Could not read settings; using defaults: " + e.getMessage()); }
         }
+        apply(p);
+    }
+
+    private static void apply(Properties p) {
         NexusClientMod.showCoordinates = bool(p, "hud.coordinates", false);
         NexusClientMod.compactHud = bool(p, "hud.compact", false);
         NexusClientMod.healthIndicator = bool(p, "hud.health_indicator", true);
@@ -31,10 +35,36 @@ public final class ClientConfig {
         NexusClientMod.showWorldClock = bool(p, "hud.world_clock", false);
     }
 
-    public static void resetDefaults() {
+    public static void applyProfile(String profile) {
+        resetValues();
+        switch (profile) {
+            case "minimal" -> { NexusClientMod.healthIndicator = true; NexusClientMod.showFps = true; }
+            case "full" -> {
+                NexusClientMod.showCoordinates = true;
+                NexusClientMod.compactHud = true;
+                NexusClientMod.healthIndicator = true;
+                NexusClientMod.showFps = true;
+                NexusClientMod.showArmor = true;
+                NexusClientMod.showDurability = true;
+                NexusClientMod.showPing = true;
+                NexusClientMod.showDirection = true;
+                NexusClientMod.showBiome = true;
+                NexusClientMod.showWorldClock = true;
+            }
+            default -> {
+                NexusClientMod.healthIndicator = true;
+                NexusClientMod.showFps = true;
+                NexusClientMod.showPing = true;
+                NexusClientMod.compactHud = true;
+            }
+        }
+        save();
+    }
+
+    private static void resetValues() {
         NexusClientMod.showCoordinates = false;
         NexusClientMod.compactHud = false;
-        NexusClientMod.healthIndicator = true;
+        NexusClientMod.healthIndicator = false;
         NexusClientMod.showFps = false;
         NexusClientMod.showArmor = false;
         NexusClientMod.showDurability = false;
@@ -42,6 +72,11 @@ public final class ClientConfig {
         NexusClientMod.showDirection = false;
         NexusClientMod.showBiome = false;
         NexusClientMod.showWorldClock = false;
+    }
+
+    public static void resetDefaults() {
+        resetValues();
+        NexusClientMod.healthIndicator = true;
         save();
     }
 
@@ -51,6 +86,33 @@ public final class ClientConfig {
         if ("true".equalsIgnoreCase(value)) return true;
         if ("false".equalsIgnoreCase(value)) return false;
         return fallback;
+    }
+
+    public static String exportSettings() {
+        return "NEXUS_CLIENT_SETTINGS_V1\n"
+            + "hud.coordinates=" + NexusClientMod.showCoordinates + "\n"
+            + "hud.compact=" + NexusClientMod.compactHud + "\n"
+            + "hud.health_indicator=" + NexusClientMod.healthIndicator + "\n"
+            + "hud.fps=" + NexusClientMod.showFps + "\n"
+            + "hud.armor=" + NexusClientMod.showArmor + "\n"
+            + "hud.durability=" + NexusClientMod.showDurability + "\n"
+            + "hud.ping=" + NexusClientMod.showPing + "\n"
+            + "hud.direction=" + NexusClientMod.showDirection + "\n"
+            + "hud.biome=" + NexusClientMod.showBiome + "\n"
+            + "hud.world_clock=" + NexusClientMod.showWorldClock;
+    }
+
+    public static boolean importSettings(String text) {
+        if (text == null || !text.startsWith("NEXUS_CLIENT_SETTINGS_V1\n") || text.length() > 4096) return false;
+        Properties p = new Properties();
+        try {
+            p.load(new java.io.StringReader(text.substring("NEXUS_CLIENT_SETTINGS_V1\n".length())));
+            apply(p);
+            save();
+            return true;
+        } catch (IOException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public static void save() {
