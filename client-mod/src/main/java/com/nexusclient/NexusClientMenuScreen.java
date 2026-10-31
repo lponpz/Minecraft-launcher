@@ -6,34 +6,30 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
 public final class NexusClientMenuScreen extends Screen {
-    public NexusClientMenuScreen() {
-        super(Text.literal("Nexus Client — Laptop Edition"));
-    }
+    public NexusClientMenuScreen() { super(Text.literal("Nexus Client — Laptop Edition")); }
 
     @Override
     protected void init() {
         clearChildren();
-        int left = this.width / 2 - 105;
-        int top = this.height / 2 - 42;
-
+        int left = this.width / 2 - 115;
+        int top = this.height / 2 - 45;
         addDrawableChild(ButtonWidget.builder(coordinateLabel(), button -> {
             NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates;
+            NexusClientMod.saveSettings();
             button.setMessage(coordinateLabel());
-        }).dimensions(left, top, 210, 20).build());
-
+        }).dimensions(left, top, 230, 20).build());
         addDrawableChild(ButtonWidget.builder(hudLabel(), button -> {
             NexusClientMod.compactHud = !NexusClientMod.compactHud;
+            NexusClientMod.saveSettings();
             button.setMessage(hudLabel());
-        }).dimensions(left, top + 25, 210, 20).build());
-
+        }).dimensions(left, top + 25, 230, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
-                .dimensions(this.width / 2 - 50, this.height - 32, 100, 20).build());
+            .dimensions(this.width / 2 - 50, this.height - 32, 100, 20).build());
     }
 
     private static Text coordinateLabel() {
         return Text.literal("Coordinates HUD: " + (NexusClientMod.showCoordinates ? "ON" : "OFF"));
     }
-
     private static Text hudLabel() {
         return Text.literal("Compact Health/Food HUD: " + (NexusClientMod.compactHud ? "ON" : "OFF"));
     }
@@ -42,16 +38,14 @@ public final class NexusClientMenuScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 18, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Right Shift opens this menu"),
+            width / 2, 36, 0xAAAAAA);
         context.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("Right Shift opens this menu"), width / 2, 36, 0xAAAAAA);
-        context.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("Laptop-first build • 752 features will be implemented in stages"),
-                width / 2, height / 2 + 22, 0xFFCC66);
+            Text.literal("Implemented: " + FeatureCatalog.implementedCount() + " / 752 planned features"),
+            width / 2, height / 2 + 28, 0xFFCC66);
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean shouldPause() {
-        return false;
-    }
+    public boolean shouldPause() { return false; }
 }
