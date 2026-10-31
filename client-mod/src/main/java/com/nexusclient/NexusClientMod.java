@@ -43,7 +43,7 @@ public final class NexusClientMod implements ClientModInitializer {
             if (showCoordinates) {
                 var pos = client.player.getBlockPos();
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("XYZ: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()), 6, y, 0xFFFFFF);
+                    Text.literal("XYZ: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " | " + client.world.getRegistryKey().getValue()), 6, y, 0xFFFFFF);
                 y += 12;
             }
             if (showDirection) {
