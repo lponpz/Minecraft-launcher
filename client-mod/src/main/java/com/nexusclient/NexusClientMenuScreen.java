@@ -32,6 +32,10 @@ public final class NexusClientMenuScreen extends Screen {
 
         addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), button -> this.client.setScreen(new ServerInviteScreen()))
             .dimensions(left, top + row * 5, totalWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), button -> {
+                ClientConfig.resetDefaults();
+                this.clearAndInit();
+            }).dimensions(left, top + row * 5 + 24, totalWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
             .dimensions(width / 2 - 50, height - 28, 100, 20).build());
     }
