@@ -26,12 +26,14 @@ public final class ClientConfig {
         }
         NexusClientMod.showCoordinates = Boolean.parseBoolean(p.getProperty("hud.coordinates", "false"));
         NexusClientMod.compactHud = Boolean.parseBoolean(p.getProperty("hud.compact", "false"));
+        NexusClientMod.healthIndicator = Boolean.parseBoolean(p.getProperty("hud.health_indicator", "true"));
     }
 
     public static void save() {
         Properties p = new Properties();
         p.setProperty("hud.coordinates", Boolean.toString(NexusClientMod.showCoordinates));
         p.setProperty("hud.compact", Boolean.toString(NexusClientMod.compactHud));
+        p.setProperty("hud.health_indicator", Boolean.toString(NexusClientMod.healthIndicator));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream out = Files.newOutputStream(FILE)) {
