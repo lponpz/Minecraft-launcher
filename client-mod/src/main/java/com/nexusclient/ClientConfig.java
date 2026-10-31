@@ -1,7 +1,6 @@
 package com.nexusclient;
 
 import net.fabricmc.loader.api.FabricLoader;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,11 +16,8 @@ public final class ClientConfig {
     public static void load() {
         Properties p = new Properties();
         if (Files.isRegularFile(FILE)) {
-            try (InputStream in = Files.newInputStream(FILE)) {
-                p.load(in);
-            } catch (IOException e) {
-                System.err.println("[Nexus Client] Could not read settings; using defaults: " + e.getMessage());
-            }
+            try (InputStream in = Files.newInputStream(FILE)) { p.load(in); }
+            catch (IOException e) { System.err.println("[Nexus Client] Could not read settings; using defaults: " + e.getMessage()); }
         }
         NexusClientMod.showCoordinates = bool(p, "hud.coordinates", false);
         NexusClientMod.compactHud = bool(p, "hud.compact", false);
@@ -31,6 +27,8 @@ public final class ClientConfig {
         NexusClientMod.showDurability = bool(p, "hud.durability", false);
         NexusClientMod.showPing = bool(p, "hud.ping", false);
         NexusClientMod.showDirection = bool(p, "hud.direction", false);
+        NexusClientMod.showBiome = bool(p, "hud.biome", false);
+        NexusClientMod.showWorldClock = bool(p, "hud.world_clock", false);
     }
 
     private static boolean bool(Properties p, String key, boolean fallback) {
@@ -51,20 +49,17 @@ public final class ClientConfig {
         p.setProperty("hud.durability", Boolean.toString(NexusClientMod.showDurability));
         p.setProperty("hud.ping", Boolean.toString(NexusClientMod.showPing));
         p.setProperty("hud.direction", Boolean.toString(NexusClientMod.showDirection));
+        p.setProperty("hud.biome", Boolean.toString(NexusClientMod.showBiome));
+        p.setProperty("hud.world_clock", Boolean.toString(NexusClientMod.showWorldClock));
         try {
             Files.createDirectories(FILE.getParent());
             Path temp = FILE.resolveSibling(FILE.getFileName() + ".tmp");
-            try (OutputStream out = Files.newOutputStream(temp)) {
-                p.store(out, "Nexus Client settings");
-            }
+            try (OutputStream out = Files.newOutputStream(temp)) { p.store(out, "Nexus Client settings"); }
             try {
-                Files.move(temp, FILE, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+                Files.move(temp, FILE, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
             } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
                 Files.move(temp, FILE, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
-        } catch (IOException e) {
-            System.err.println("[Nexus Client] Could not save settings: " + e.getMessage());
-        }
+        } catch (IOException e) { System.err.println("[Nexus Client] Could not save settings: " + e.getMessage()); }
     }
 }
