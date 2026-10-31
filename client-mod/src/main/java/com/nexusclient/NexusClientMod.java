@@ -15,6 +15,9 @@ public final class NexusClientMod implements ClientModInitializer {
     public static boolean showCoordinates = false;
     public static boolean compactHud = false;
     public static boolean healthIndicator = true;
+    public static boolean showFps = false;
+    public static boolean showArmor = false;
+    public static boolean showDurability = false;
 
     @Override
     public void onInitializeClient() {
@@ -45,6 +48,36 @@ public final class NexusClientMod implements ClientModInitializer {
                     Text.literal("HP: " + Math.round(client.player.getHealth()) + " | Food: " +
                         client.player.getHungerManager().getFoodLevel()), 6, y, 0xFFFFFF);
                 y += 12;
+            }
+            if (showFps) {
+                drawContext.drawTextWithShadow(client.textRenderer,
+                    Text.literal("FPS: " + MinecraftClient.getCurrentFps()), 6, y, 0xFFFFFF);
+                y += 12;
+            }
+            if (showArmor) {
+                int armor = client.player.getArmor();
+                drawContext.drawTextWithShadow(client.textRenderer,
+                    Text.literal("Armor: " + armor), 6, y, 0x55AAFF);
+                y += 12;
+            }
+            if (showDurability) {
+                var inv = client.player.getInventory();
+                StringBuilder line = new StringBuilder("Gear: ");
+                boolean any = false;
+                for (var stack : inv.armor) {
+                    if (!stack.isEmpty() && stack.isDamageable()) {
+                        if (any) line.append(" | ");
+                        line.append(stack.getName().getString()).append(" ")
+                            .append(Math.max(0, stack.getMaxDamage() - stack.getDamage()))
+                            .append("/").append(stack.getMaxDamage());
+                        any = true;
+                    }
+                }
+                if (any) {
+                    drawContext.drawTextWithShadow(client.textRenderer,
+                        Text.literal(line.toString()), 6, y, 0xFFFFFF);
+                    y += 12;
+                }
             }
             if (healthIndicator) {
                 float health = Math.max(0.0F, client.player.getHealth());
