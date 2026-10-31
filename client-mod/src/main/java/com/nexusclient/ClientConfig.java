@@ -33,6 +33,7 @@ public final class ClientConfig {
         NexusClientMod.showDirection = bool(p, "hud.direction", false);
         NexusClientMod.showBiome = bool(p, "hud.biome", false);
         NexusClientMod.showWorldClock = bool(p, "hud.world_clock", false);
+        NexusClientMod.hudOffsetY = integer(p, "hud.offset_y", 0, -100, 100);
     }
 
     public static void applyProfile(String profile) {
@@ -72,12 +73,18 @@ public final class ClientConfig {
         NexusClientMod.showDirection = false;
         NexusClientMod.showBiome = false;
         NexusClientMod.showWorldClock = false;
+        NexusClientMod.hudOffsetY = 0;
     }
 
     public static void resetDefaults() {
         resetValues();
         NexusClientMod.healthIndicator = true;
         save();
+    }
+
+    private static int integer(Properties p, String key, int fallback, int min, int max) {
+        try { return Math.max(min, Math.min(max, Integer.parseInt(p.getProperty(key, Integer.toString(fallback))))); }
+        catch (NumberFormatException ignored) { return fallback; }
     }
 
     private static boolean bool(Properties p, String key, boolean fallback) {
@@ -99,7 +106,8 @@ public final class ClientConfig {
             + "hud.ping=" + NexusClientMod.showPing + "\n"
             + "hud.direction=" + NexusClientMod.showDirection + "\n"
             + "hud.biome=" + NexusClientMod.showBiome + "\n"
-            + "hud.world_clock=" + NexusClientMod.showWorldClock;
+            + "hud.world_clock=" + NexusClientMod.showWorldClock + "\n"
+            + "hud.offset_y=" + NexusClientMod.hudOffsetY;
     }
 
     public static boolean importSettings(String text) {
@@ -127,6 +135,7 @@ public final class ClientConfig {
         p.setProperty("hud.direction", Boolean.toString(NexusClientMod.showDirection));
         p.setProperty("hud.biome", Boolean.toString(NexusClientMod.showBiome));
         p.setProperty("hud.world_clock", Boolean.toString(NexusClientMod.showWorldClock));
+        p.setProperty("hud.offset_y", Integer.toString(NexusClientMod.hudOffsetY));
         try {
             Files.createDirectories(FILE.getParent());
             Path temp = FILE.resolveSibling(FILE.getFileName() + ".tmp");
