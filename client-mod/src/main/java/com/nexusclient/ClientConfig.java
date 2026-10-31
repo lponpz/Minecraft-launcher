@@ -9,10 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-/** Small persistent configuration for the first implemented client features. */
+/** Persistent, validated configuration for Nexus Client. */
 public final class ClientConfig {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("nexus-client.properties");
-
     private ClientConfig() {}
 
     public static void load() {
@@ -20,16 +19,26 @@ public final class ClientConfig {
         if (Files.isRegularFile(FILE)) {
             try (InputStream in = Files.newInputStream(FILE)) {
                 p.load(in);
-            } catch (IOException ignored) {
-                // Keep safe defaults if the config is damaged or unreadable.
+            } catch (IOException e) {
+                System.err.println("[Nexus Client] Could not read settings; using defaults: " + e.getMessage());
             }
         }
-        NexusClientMod.showCoordinates = Boolean.parseBoolean(p.getProperty("hud.coordinates", "false"));
-        NexusClientMod.compactHud = Boolean.parseBoolean(p.getProperty("hud.compact", "false"));
-        NexusClientMod.healthIndicator = Boolean.parseBoolean(p.getProperty("hud.health_indicator", "true"));
-        NexusClientMod.showFps = Boolean.parseBoolean(p.getProperty("hud.fps", "false"));
-        NexusClientMod.showArmor = Boolean.parseBoolean(p.getProperty("hud.armor", "false"));
-        NexusClientMod.showDurability = Boolean.parseBoolean(p.getProperty("hud.durability", "false"));
+        NexusClientMod.showCoordinates = bool(p, "hud.coordinates", false);
+        NexusClientMod.compactHud = bool(p, "hud.compact", false);
+        NexusClientMod.healthIndicator = bool(p, "hud.health_indicator", true);
+        NexusClientMod.showFps = bool(p, "hud.fps", false);
+        NexusClientMod.showArmor = bool(p, "hud.armor", false);
+        NexusClientMod.showDurability = bool(p, "hud.durability", false);
+        NexusClientMod.showPing = bool(p, "hud.ping", false);
+        NexusClientMod.showDirection = bool(p, "hud.direction", false);
+    }
+
+    private static boolean bool(Properties p, String key, boolean fallback) {
+        String value = p.getProperty(key);
+        if (value == null) return fallback;
+        if ("true".equalsIgnoreCase(value)) return true;
+        if ("false".equalsIgnoreCase(value)) return false;
+        return fallback;
     }
 
     public static void save() {
@@ -40,10 +49,19 @@ public final class ClientConfig {
         p.setProperty("hud.fps", Boolean.toString(NexusClientMod.showFps));
         p.setProperty("hud.armor", Boolean.toString(NexusClientMod.showArmor));
         p.setProperty("hud.durability", Boolean.toString(NexusClientMod.showDurability));
+        p.setProperty("hud.ping", Boolean.toString(NexusClientMod.showPing));
+        p.setProperty("hud.direction", Boolean.toString(NexusClientMod.showDirection));
         try {
             Files.createDirectories(FILE.getParent());
-            try (OutputStream out = Files.newOutputStream(FILE)) {
+            Path temp = FILE.resolveSibling(FILE.getFileName() + ".tmp");
+            try (OutputStream out = Files.newOutputStream(temp)) {
                 p.store(out, "Nexus Client settings");
+            }
+            try {
+                Files.move(temp, FILE, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
+                Files.move(temp, FILE, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             System.err.println("[Nexus Client] Could not save settings: " + e.getMessage());
