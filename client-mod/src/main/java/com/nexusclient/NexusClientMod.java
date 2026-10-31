@@ -18,6 +18,8 @@ public final class NexusClientMod implements ClientModInitializer {
     public static boolean showFps = false;
     public static boolean showArmor = false;
     public static boolean showDurability = false;
+    public static boolean showPing = false;
+    public static boolean showDirection = false;
 
     @Override
     public void onInitializeClient() {
@@ -43,6 +45,19 @@ public final class NexusClientMod implements ClientModInitializer {
                     6, y, 0xFFFFFF);
                 y += 12;
             }
+            if (showDirection) {
+                drawContext.drawTextWithShadow(client.textRenderer,
+                    Text.literal("Facing: " + client.player.getHorizontalFacing().asString().toUpperCase()),
+                    6, y, 0x55CCFF);
+                y += 12;
+            }
+            if (showPing) {
+                var handler = client.getNetworkHandler();
+                var entry = handler == null ? null : handler.getPlayerListEntry(client.player.getUuid());
+                String ping = entry == null ? "Ping: --" : "Ping: " + entry.getLatency() + " ms";
+                drawContext.drawTextWithShadow(client.textRenderer, Text.literal(ping), 6, y, 0xFFFFFF);
+                y += 12;
+            }
             if (compactHud) {
                 drawContext.drawTextWithShadow(client.textRenderer,
                     Text.literal("HP: " + Math.round(client.player.getHealth()) + " | Food: " +
@@ -55,9 +70,8 @@ public final class NexusClientMod implements ClientModInitializer {
                 y += 12;
             }
             if (showArmor) {
-                int armor = client.player.getArmor();
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("Armor: " + armor), 6, y, 0x55AAFF);
+                    Text.literal("Armor: " + client.player.getArmor()), 6, y, 0x55AAFF);
                 y += 12;
             }
             if (showDurability) {
@@ -74,8 +88,7 @@ public final class NexusClientMod implements ClientModInitializer {
                     }
                 }
                 if (any) {
-                    drawContext.drawTextWithShadow(client.textRenderer,
-                        Text.literal(line.toString()), 6, y, 0xFFFFFF);
+                    drawContext.drawTextWithShadow(client.textRenderer, Text.literal(line.toString()), 6, y, 0xFFFFFF);
                     y += 12;
                 }
             }
