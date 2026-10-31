@@ -5,48 +5,37 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 public final class NexusClientMenuScreen extends Screen {
-    private final Map<String, Boolean> toggles = new LinkedHashMap<>();
-    private int page = 0;
-
     public NexusClientMenuScreen() {
-        super(Text.literal("Nexus Client — Mod Menu"));
-        toggles.put("Compact HUD (prototype)", false);
-        toggles.put("Reduced visual effects (prototype)", false);
-        toggles.put("Show coordinates (prototype)", false);
-        toggles.put("Performance profile (prototype)", false);
-        toggles.put("Custom HUD layout (planned)", false);
-        toggles.put("Feature search (planned)", false);
-        toggles.put("Profiles (planned)", false);
-        toggles.put("Keybind editor (planned)", false);
+        super(Text.literal("Nexus Client — Laptop Edition"));
     }
 
     @Override
     protected void init() {
         clearChildren();
-        int left = this.width / 2 - 120;
-        int top = this.height / 2 - 70;
+        int left = this.width / 2 - 105;
+        int top = this.height / 2 - 42;
 
-        int index = 0;
-        for (String name : toggles.keySet()) {
-            final String key = name;
-            int y = top + (index * 24);
-            if (y > this.height - 45) break;
-            addDrawableChild(ButtonWidget.builder(
-                    Text.literal(name + ": " + (toggles.get(name) ? "ON" : "OFF")),
-                    button -> {
-                        toggles.put(key, !toggles.get(key));
-                        button.setMessage(Text.literal(key + ": " + (toggles.get(key) ? "ON" : "OFF")));
-                    }
-            ).dimensions(left, y, 240, 20).build());
-            index++;
-        }
+        addDrawableChild(ButtonWidget.builder(coordinateLabel(), button -> {
+            NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates;
+            button.setMessage(coordinateLabel());
+        }).dimensions(left, top, 210, 20).build());
+
+        addDrawableChild(ButtonWidget.builder(hudLabel(), button -> {
+            NexusClientMod.compactHud = !NexusClientMod.compactHud;
+            button.setMessage(hudLabel());
+        }).dimensions(left, top + 25, 210, 20).build());
 
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
-                .dimensions(this.width / 2 - 50, this.height - 30, 100, 20).build());
+                .dimensions(this.width / 2 - 50, this.height - 32, 100, 20).build());
+    }
+
+    private static Text coordinateLabel() {
+        return Text.literal("Coordinates HUD: " + (NexusClientMod.showCoordinates ? "ON" : "OFF"));
+    }
+
+    private static Text hudLabel() {
+        return Text.literal("Compact Health/Food HUD: " + (NexusClientMod.compactHud ? "ON" : "OFF"));
     }
 
     @Override
@@ -54,8 +43,10 @@ public final class NexusClientMenuScreen extends Screen {
         renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 18, 0xFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("Foundation build — not all planned features are implemented"),
-                width / 2, 34, 0xFFCC66);
+                Text.literal("Right Shift opens this menu"), width / 2, 36, 0xAAAAAA);
+        context.drawCenteredTextWithShadow(textRenderer,
+                Text.literal("Laptop-first build • 752 features will be implemented in stages"),
+                width / 2, height / 2 + 22, 0xFFCC66);
         super.render(context, mouseX, mouseY, delta);
     }
 
