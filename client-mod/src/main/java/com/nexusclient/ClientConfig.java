@@ -27,6 +27,9 @@ public final class ClientConfig {
         NexusClientMod.showCoordinates = Boolean.parseBoolean(p.getProperty("hud.coordinates", "false"));
         NexusClientMod.compactHud = Boolean.parseBoolean(p.getProperty("hud.compact", "false"));
         NexusClientMod.healthIndicator = Boolean.parseBoolean(p.getProperty("hud.health_indicator", "true"));
+        NexusClientMod.showFps = Boolean.parseBoolean(p.getProperty("hud.fps", "false"));
+        NexusClientMod.showArmor = Boolean.parseBoolean(p.getProperty("hud.armor", "false"));
+        NexusClientMod.showDurability = Boolean.parseBoolean(p.getProperty("hud.durability", "false"));
     }
 
     public static void save() {
@@ -34,6 +37,9 @@ public final class ClientConfig {
         p.setProperty("hud.coordinates", Boolean.toString(NexusClientMod.showCoordinates));
         p.setProperty("hud.compact", Boolean.toString(NexusClientMod.compactHud));
         p.setProperty("hud.health_indicator", Boolean.toString(NexusClientMod.healthIndicator));
+        p.setProperty("hud.fps", Boolean.toString(NexusClientMod.showFps));
+        p.setProperty("hud.armor", Boolean.toString(NexusClientMod.showArmor));
+        p.setProperty("hud.durability", Boolean.toString(NexusClientMod.showDurability));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream out = Files.newOutputStream(FILE)) {
