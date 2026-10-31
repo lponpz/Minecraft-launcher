@@ -28,7 +28,7 @@ public final class NexusClientMod implements ClientModInitializer {
         ClientConfig.load();
         openMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.nexusclient.open_menu", InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_RIGHT_SHIFT, KeyBinding.Category.MISC));
+                GLFW.GLFW_KEY_RIGHT_SHIFT, "category.nexusclient.general"));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openMenuKey.wasPressed()) {
@@ -81,7 +81,7 @@ public final class NexusClientMod implements ClientModInitializer {
             }
             if (showFps) {
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("FPS: " + MinecraftClient.getCurrentFps()), 6, y, 0xFFFFFF);
+                    Text.literal("FPS: " + client.getCurrentFps()), 6, y, 0xFFFFFF);
                 y += 12;
             }
             if (showArmor) {
