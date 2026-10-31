@@ -43,7 +43,7 @@ public final class NexusClientMenuScreen extends Screen {
             NexusClientMod.saveSettings();
             button.setMessage(durabilityLabel());
         }).dimensions(left, top + 125, 230, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
+        addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), button ->\n            this.client.setScreen(new ServerInviteScreen()))\n            .dimensions(left, top + 150, 230, 20).build());\n        addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
             .dimensions(this.width / 2 - 50, this.height - 32, 100, 20).build());
     }
 
