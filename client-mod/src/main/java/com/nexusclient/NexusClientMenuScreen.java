@@ -1,11 +1,13 @@
 package com.nexusclient;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
 public final class NexusClientMenuScreen extends Screen {
+    private String status = "Choose a profile or customize each HUD item.";
     public NexusClientMenuScreen() { super(Text.literal("Nexus Client — Laptop Edition")); }
 
     @Override
@@ -16,8 +18,8 @@ public final class NexusClientMenuScreen extends Screen {
         int totalWidth = buttonWidth * 2 + gap;
         int left = Math.max(8, (width - totalWidth) / 2);
         int right = left + buttonWidth + gap;
-        int row = 24;
-        int top = 58;
+        int row = 22;
+        int top = 54;
 
         addDrawableChild(toggle(left, top, buttonWidth, coordinateLabel(), () -> NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates, NexusClientMenuScreen::coordinateLabel));
         addDrawableChild(toggle(right, top, buttonWidth, hudLabel(), () -> NexusClientMod.compactHud = !NexusClientMod.compactHud, NexusClientMenuScreen::hudLabel));
@@ -30,27 +32,38 @@ public final class NexusClientMenuScreen extends Screen {
         addDrawableChild(toggle(left, top + row * 4, buttonWidth, biomeLabel(), () -> NexusClientMod.showBiome = !NexusClientMod.showBiome, NexusClientMenuScreen::biomeLabel));
         addDrawableChild(toggle(right, top + row * 4, buttonWidth, clockLabel(), () -> NexusClientMod.showWorldClock = !NexusClientMod.showWorldClock, NexusClientMenuScreen::clockLabel));
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), button -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(left, top + row * 5, totalWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), button -> {
-                ClientConfig.resetDefaults();
-                this.clearAndInit();
-            }).dimensions(left, top + row * 5 + 24, totalWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
-            .dimensions(width / 2 - 50, height - 28, 100, 20).build());
+        int toolsY = top + row * 5;
+        addDrawableChild(ButtonWidget.builder(Text.literal("Minimal Profile"), b -> { ClientConfig.applyProfile("minimal"); status = "Minimal profile applied."; clearAndInit(); })
+            .dimensions(left, toolsY, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
+            .dimensions(right, toolsY, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Full HUD Profile"), b -> { ClientConfig.applyProfile("full"); status = "Full HUD profile applied."; clearAndInit(); })
+            .dimensions(left, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Copy Settings"), b -> {
+            MinecraftClient c = MinecraftClient.getInstance();
+            if (c.keyboard != null) { c.keyboard.setClipboard(ClientConfig.exportSettings()); status = "Settings copied to clipboard."; }
+            else status = "Clipboard unavailable.";
+        }).dimensions(right, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Import Clipboard"), b -> {
+            MinecraftClient c = MinecraftClient.getInstance();
+            if (c.keyboard != null && ClientConfig.importSettings(c.keyboard.getClipboard())) { status = "Settings imported."; clearAndInit(); }
+            else status = "Clipboard has no valid Nexus settings export.";
+        }).dimensions(left, toolsY + 46, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), b -> this.client.setScreen(new ServerInviteScreen()))
+            .dimensions(right, toolsY + 46, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), b -> { ClientConfig.resetDefaults(); status = "Settings reset."; clearAndInit(); })
+            .dimensions(left, toolsY + 69, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Close"), b -> close())
+            .dimensions(right, toolsY + 69, buttonWidth, 20).build());
     }
 
-    private ButtonWidget toggle(int x, int y, int w, Text label, Runnable action, java.util.function.Supplier<Text> labelSupplier) {
-        return ButtonWidget.builder(label, button -> {
-            action.run();
-            ClientConfig.save();
-            button.setMessage(labelSupplier.get());
-        }).dimensions(x, y, w, 20).build();
+    private ButtonWidget toggle(int x, int y, int w, Text label, Runnable action, java.util.function.Supplier<Text> supplier) {
+        return ButtonWidget.builder(label, button -> { action.run(); ClientConfig.save(); button.setMessage(supplier.get()); })
+            .dimensions(x, y, w, 20).build();
     }
-
     private static String onOff(boolean value) { return value ? "ON" : "OFF"; }
     private static Text coordinateLabel() { return Text.literal("Coordinates HUD: " + onOff(NexusClientMod.showCoordinates)); }
-    private static Text hudLabel() { return Text.literal("Compact Health/Food HUD: " + onOff(NexusClientMod.compactHud)); }
+    private static Text hudLabel() { return Text.literal("Compact Health/Food: " + onOff(NexusClientMod.compactHud)); }
     private static Text healthLabel() { return Text.literal("Health Indicator: " + onOff(NexusClientMod.healthIndicator)); }
     private static Text fpsLabel() { return Text.literal("FPS Counter: " + onOff(NexusClientMod.showFps)); }
     private static Text armorLabel() { return Text.literal("Armor Indicator: " + onOff(NexusClientMod.showArmor)); }
@@ -63,12 +76,10 @@ public final class NexusClientMenuScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 18, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Right Shift opens this menu"), width / 2, 36, 0xAAAAAA);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Nexus Client | Minecraft Java 1.21.1"), width / 2, height - 48, 0xFFCC66);
+        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 16, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Right Shift opens this menu"), width / 2, 32, 0xAAAAAA);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal(status), width / 2, height - 38, 0xFFCC66);
         super.render(context, mouseX, mouseY, delta);
     }
-
-    @Override
-    public boolean shouldPause() { return false; }
+    @Override public boolean shouldPause() { return false; }
 }
