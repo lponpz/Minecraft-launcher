@@ -57,6 +57,14 @@ public final class NexusClientMenuScreen extends Screen {
             status = "Particle setting: " + next.name().toLowerCase(java.util.Locale.ROOT) + ".";
             b.setMessage(particlesLabel());
         }).dimensions(right, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Low-End Performance"), b -> {
+            var options = MinecraftClient.getInstance().options;
+            options.getViewDistance().setValue(4);
+            options.getParticles().setValue(ParticlesMode.MINIMAL);
+            options.write();
+            status = "Low-end profile: 4 chunks, minimal particles.";
+            clearAndInit();
+        }).dimensions(left, toolsY + 46, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Minimal Profile"), b -> { ClientConfig.applyProfile("minimal"); status = "Minimal profile applied."; clearAndInit(); })
             .dimensions(left, toolsY + 46, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
@@ -74,7 +82,7 @@ public final class NexusClientMenuScreen extends Screen {
             else status = "Clipboard has no valid Nexus settings export.";
         }).dimensions(left, toolsY + 92, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), b -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(right, toolsY + 115, buttonWidth, 20).build());
+            .dimensions(right, toolsY + 138, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), b -> { ClientConfig.resetDefaults(); status = "Settings reset."; clearAndInit(); })
             .dimensions(left, toolsY + 115, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), b -> close())
