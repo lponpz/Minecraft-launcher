@@ -31,6 +31,20 @@ public final class ClientConfig {
         NexusClientMod.showWorldClock = bool(p, "hud.world_clock", false);
     }
 
+    public static void resetDefaults() {
+        NexusClientMod.showCoordinates = false;
+        NexusClientMod.compactHud = false;
+        NexusClientMod.healthIndicator = true;
+        NexusClientMod.showFps = false;
+        NexusClientMod.showArmor = false;
+        NexusClientMod.showDurability = false;
+        NexusClientMod.showPing = false;
+        NexusClientMod.showDirection = false;
+        NexusClientMod.showBiome = false;
+        NexusClientMod.showWorldClock = false;
+        save();
+    }
+
     private static boolean bool(Properties p, String key, boolean fallback) {
         String value = p.getProperty(key);
         if (value == null) return fallback;
