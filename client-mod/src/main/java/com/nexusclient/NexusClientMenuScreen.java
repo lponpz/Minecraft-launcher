@@ -54,11 +54,11 @@ public final class NexusClientMenuScreen extends Screen {
             else status = "Clipboard has no valid Nexus settings export.";
         }).dimensions(left, toolsY + 69, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), b -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(right, toolsY + 92, buttonWidth, 20).build());
+            .dimensions(right, toolsY + 69, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), b -> { ClientConfig.resetDefaults(); status = "Settings reset."; clearAndInit(); })
             .dimensions(left, toolsY + 92, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), b -> close())
-            .dimensions(right, toolsY + 69, buttonWidth, 20).build());
+            .dimensions(right, toolsY + 92, buttonWidth, 20).build());
     }
 
     private ButtonWidget toggle(int x, int y, int w, Text label, Runnable action, java.util.function.Supplier<Text> supplier) {
