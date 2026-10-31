@@ -22,6 +22,7 @@ public final class NexusClientMod implements ClientModInitializer {
     public static boolean showDirection = false;
     public static boolean showBiome = false;
     public static boolean showWorldClock = false;
+    public static int hudOffsetY = 0;
 
     @Override
     public void onInitializeClient() {
@@ -39,7 +40,7 @@ public final class NexusClientMod implements ClientModInitializer {
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player == null || client.world == null) return;
-            int y = 6;
+            int y = 6 + hudOffsetY;
             if (showCoordinates) {
                 var pos = client.player.getBlockPos();
                 drawContext.drawTextWithShadow(client.textRenderer,
