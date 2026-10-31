@@ -20,6 +20,8 @@ public final class NexusClientMod implements ClientModInitializer {
     public static boolean showDurability = false;
     public static boolean showPing = false;
     public static boolean showDirection = false;
+    public static boolean showBiome = false;
+    public static boolean showWorldClock = false;
 
     @Override
     public void onInitializeClient() {
@@ -41,14 +43,27 @@ public final class NexusClientMod implements ClientModInitializer {
             if (showCoordinates) {
                 var pos = client.player.getBlockPos();
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("XYZ: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()),
-                    6, y, 0xFFFFFF);
+                    Text.literal("XYZ: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()), 6, y, 0xFFFFFF);
                 y += 12;
             }
             if (showDirection) {
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("Facing: " + client.player.getHorizontalFacing().asString().toUpperCase()),
-                    6, y, 0x55CCFF);
+                    Text.literal("Facing: " + client.player.getHorizontalFacing().asString().toUpperCase()), 6, y, 0x55CCFF);
+                y += 12;
+            }
+            if (showBiome) {
+                String biome = client.world.getBiome(client.player.getBlockPos()).getKey()
+                    .map(key -> key.getValue().toString()).orElse("unknown");
+                drawContext.drawTextWithShadow(client.textRenderer, Text.literal("Biome: " + biome), 6, y, 0xAAFFAA);
+                y += 12;
+            }
+            if (showWorldClock) {
+                long dayTime = Math.floorMod(client.world.getTimeOfDay(), 24000L);
+                long ticks = (dayTime + 6000L) % 24000L;
+                int hour = (int) (ticks / 1000L);
+                int minute = (int) ((ticks % 1000L) * 60L / 1000L);
+                drawContext.drawTextWithShadow(client.textRenderer,
+                    Text.literal(String.format(java.util.Locale.ROOT, "World time: %02d:%02d", hour, minute)), 6, y, 0xFFFFAA);
                 y += 12;
             }
             if (showPing) {
@@ -97,11 +112,9 @@ public final class NexusClientMod implements ClientModInitializer {
                 float maxHealth = Math.max(1.0F, client.player.getMaxHealth());
                 int filled = Math.max(0, Math.min(10, Math.round((health / maxHealth) * 10.0F)));
                 String bar = "♥".repeat(filled) + "♡".repeat(10 - filled);
-                int color = health / maxHealth > 0.5F ? 0x55FF55
-                        : health / maxHealth > 0.25F ? 0xFFAA00 : 0xFF5555;
+                int color = health / maxHealth > 0.5F ? 0x55FF55 : health / maxHealth > 0.25F ? 0xFFAA00 : 0xFF5555;
                 drawContext.drawTextWithShadow(client.textRenderer,
-                    Text.literal("Health " + Math.round(health) + "/" + Math.round(maxHealth) + " " + bar),
-                    6, y, color);
+                    Text.literal("Health " + Math.round(health) + "/" + Math.round(maxHealth) + " " + bar), 6, y, color);
             }
         });
     }
