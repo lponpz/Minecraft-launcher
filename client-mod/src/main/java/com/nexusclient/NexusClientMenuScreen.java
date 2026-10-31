@@ -33,26 +33,30 @@ public final class NexusClientMenuScreen extends Screen {
         addDrawableChild(toggle(right, top + row * 4, buttonWidth, clockLabel(), () -> NexusClientMod.showWorldClock = !NexusClientMod.showWorldClock, NexusClientMenuScreen::clockLabel));
 
         int toolsY = top + row * 5;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Minimal Profile"), b -> { ClientConfig.applyProfile("minimal"); status = "Minimal profile applied."; clearAndInit(); })
+        addDrawableChild(ButtonWidget.builder(Text.literal("HUD Up"), b -> { NexusClientMod.hudOffsetY = Math.max(-100, NexusClientMod.hudOffsetY - 5); ClientConfig.save(); status = "HUD vertical offset: " + NexusClientMod.hudOffsetY; })
             .dimensions(left, toolsY, buttonWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
+        addDrawableChild(ButtonWidget.builder(Text.literal("HUD Down"), b -> { NexusClientMod.hudOffsetY = Math.min(100, NexusClientMod.hudOffsetY + 5); ClientConfig.save(); status = "HUD vertical offset: " + NexusClientMod.hudOffsetY; })
             .dimensions(right, toolsY, buttonWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Full HUD Profile"), b -> { ClientConfig.applyProfile("full"); status = "Full HUD profile applied."; clearAndInit(); })
+        addDrawableChild(ButtonWidget.builder(Text.literal("Minimal Profile"), b -> { ClientConfig.applyProfile("minimal"); status = "Minimal profile applied."; clearAndInit(); })
             .dimensions(left, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
+            .dimensions(right, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Full HUD Profile"), b -> { ClientConfig.applyProfile("full"); status = "Full HUD profile applied."; clearAndInit(); })
+            .dimensions(left, toolsY + 46, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Copy Settings"), b -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.keyboard != null) { c.keyboard.setClipboard(ClientConfig.exportSettings()); status = "Settings copied to clipboard."; }
             else status = "Clipboard unavailable.";
-        }).dimensions(right, toolsY + 23, buttonWidth, 20).build());
+        }).dimensions(right, toolsY + 46, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Import Clipboard"), b -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.keyboard != null && ClientConfig.importSettings(c.keyboard.getClipboard())) { status = "Settings imported."; clearAndInit(); }
             else status = "Clipboard has no valid Nexus settings export.";
-        }).dimensions(left, toolsY + 46, buttonWidth, 20).build());
+        }).dimensions(left, toolsY + 69, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), b -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(right, toolsY + 46, buttonWidth, 20).build());
+            .dimensions(right, toolsY + 92, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), b -> { ClientConfig.resetDefaults(); status = "Settings reset."; clearAndInit(); })
-            .dimensions(left, toolsY + 69, buttonWidth, 20).build());
+            .dimensions(left, toolsY + 92, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), b -> close())
             .dimensions(right, toolsY + 69, buttonWidth, 20).build());
     }
