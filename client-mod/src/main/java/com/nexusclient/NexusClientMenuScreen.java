@@ -12,7 +12,7 @@ public final class NexusClientMenuScreen extends Screen {
     protected void init() {
         clearChildren();
         int left = this.width / 2 - 115;
-        int top = this.height / 2 - 45;
+        int top = this.height / 2 - 58;
         addDrawableChild(ButtonWidget.builder(coordinateLabel(), button -> {
             NexusClientMod.showCoordinates = !NexusClientMod.showCoordinates;
             NexusClientMod.saveSettings();
@@ -23,12 +23,20 @@ public final class NexusClientMenuScreen extends Screen {
             NexusClientMod.saveSettings();
             button.setMessage(hudLabel());
         }).dimensions(left, top + 25, 230, 20).build());
+        addDrawableChild(ButtonWidget.builder(healthLabel(), button -> {
+            NexusClientMod.healthIndicator = !NexusClientMod.healthIndicator;
+            NexusClientMod.saveSettings();
+            button.setMessage(healthLabel());
+        }).dimensions(left, top + 50, 230, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
             .dimensions(this.width / 2 - 50, this.height - 32, 100, 20).build());
     }
 
     private static Text coordinateLabel() {
         return Text.literal("Coordinates HUD: " + (NexusClientMod.showCoordinates ? "ON" : "OFF"));
+    }
+    private static Text healthLabel() {
+        return Text.literal("Health Indicator: " + (NexusClientMod.healthIndicator ? "ON" : "OFF"));
     }
     private static Text hudLabel() {
         return Text.literal("Compact Health/Food HUD: " + (NexusClientMod.compactHud ? "ON" : "OFF"));
@@ -42,7 +50,7 @@ public final class NexusClientMenuScreen extends Screen {
             width / 2, 36, 0xAAAAAA);
         context.drawCenteredTextWithShadow(textRenderer,
             Text.literal("Implemented: " + FeatureCatalog.implementedCount() + " / 752 planned features"),
-            width / 2, height / 2 + 28, 0xFFCC66);
+            width / 2, height / 2 + 40, 0xFFCC66);
         super.render(context, mouseX, mouseY, delta);
     }
 
