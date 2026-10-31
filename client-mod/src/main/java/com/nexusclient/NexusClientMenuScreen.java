@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.option.ParticlesMode;
 import net.minecraft.text.Text;
 
 public final class NexusClientMenuScreen extends Screen {
@@ -37,26 +38,45 @@ public final class NexusClientMenuScreen extends Screen {
             .dimensions(left, toolsY, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("HUD Down"), b -> { NexusClientMod.hudOffsetY = Math.min(100, NexusClientMod.hudOffsetY + 5); ClientConfig.save(); status = "HUD vertical offset: " + NexusClientMod.hudOffsetY; })
             .dimensions(right, toolsY, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(viewDistanceLabel(), b -> {
+            var options = MinecraftClient.getInstance().options;
+            int current = options.getViewDistance().getValue();
+            int next = current >= 12 ? 2 : current >= 8 ? 12 : current >= 6 ? 8 : current >= 4 ? 6 : 4;
+            options.getViewDistance().setValue(next);
+            options.write();
+            status = "Render distance set to " + next + " chunks.";
+            b.setMessage(viewDistanceLabel());
+        }).dimensions(left, toolsY + 23, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(particlesLabel(), b -> {
+            var option = MinecraftClient.getInstance().options.getParticles();
+            ParticlesMode current = option.getValue();
+            ParticlesMode next = current == ParticlesMode.ALL ? ParticlesMode.DECREASED
+                : current == ParticlesMode.DECREASED ? ParticlesMode.MINIMAL : ParticlesMode.ALL;
+            option.setValue(next);
+            MinecraftClient.getInstance().options.write();
+            status = "Particle setting: " + next.name().toLowerCase(java.util.Locale.ROOT) + ".";
+            b.setMessage(particlesLabel());
+        }).dimensions(right, toolsY + 23, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Minimal Profile"), b -> { ClientConfig.applyProfile("minimal"); status = "Minimal profile applied."; clearAndInit(); })
-            .dimensions(left, toolsY + 23, buttonWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
-            .dimensions(right, toolsY + 23, buttonWidth, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Full HUD Profile"), b -> { ClientConfig.applyProfile("full"); status = "Full HUD profile applied."; clearAndInit(); })
             .dimensions(left, toolsY + 46, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Balanced Profile"), b -> { ClientConfig.applyProfile("balanced"); status = "Balanced profile applied."; clearAndInit(); })
+            .dimensions(right, toolsY + 46, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Full HUD Profile"), b -> { ClientConfig.applyProfile("full"); status = "Full HUD profile applied."; clearAndInit(); })
+            .dimensions(left, toolsY + 69, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Copy Settings"), b -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.keyboard != null) { c.keyboard.setClipboard(ClientConfig.exportSettings()); status = "Settings copied to clipboard."; }
             else status = "Clipboard unavailable.";
-        }).dimensions(right, toolsY + 46, buttonWidth, 20).build());
+        }).dimensions(right, toolsY + 69, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Import Clipboard"), b -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.keyboard != null && ClientConfig.importSettings(c.keyboard.getClipboard())) { status = "Settings imported."; clearAndInit(); }
             else status = "Clipboard has no valid Nexus settings export.";
-        }).dimensions(left, toolsY + 69, buttonWidth, 20).build());
+        }).dimensions(left, toolsY + 92, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Friend Server Invites"), b -> this.client.setScreen(new ServerInviteScreen()))
-            .dimensions(right, toolsY + 69, buttonWidth, 20).build());
+            .dimensions(right, toolsY + 115, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Reset Settings"), b -> { ClientConfig.resetDefaults(); status = "Settings reset."; clearAndInit(); })
-            .dimensions(left, toolsY + 92, buttonWidth, 20).build());
+            .dimensions(left, toolsY + 115, buttonWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), b -> close())
             .dimensions(right, toolsY + 92, buttonWidth, 20).build());
     }
@@ -64,6 +84,12 @@ public final class NexusClientMenuScreen extends Screen {
     private ButtonWidget toggle(int x, int y, int w, Text label, Runnable action, java.util.function.Supplier<Text> supplier) {
         return ButtonWidget.builder(label, button -> { action.run(); ClientConfig.save(); button.setMessage(supplier.get()); })
             .dimensions(x, y, w, 20).build();
+    }
+    private static Text viewDistanceLabel() {
+        return Text.literal("Render Distance: " + MinecraftClient.getInstance().options.getViewDistance().getValue() + " chunks");
+    }
+    private static Text particlesLabel() {
+        return Text.literal("Particles: " + MinecraftClient.getInstance().options.getParticles().getValue().name().toLowerCase(java.util.Locale.ROOT));
     }
     private static String onOff(boolean value) { return value ? "ON" : "OFF"; }
     private static Text coordinateLabel() { return Text.literal("Coordinates HUD: " + onOff(NexusClientMod.showCoordinates)); }
